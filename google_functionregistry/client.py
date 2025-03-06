@@ -4,9 +4,9 @@ import re
 from dataclasses import dataclass
 from typing import Iterable
 
+import google.generativeai as genai
 import tiktoken
 from dotenv import load_dotenv
-from openai import AsyncAzureOpenAI, AzureOpenAI
 
 load_dotenv()
 
@@ -97,37 +97,22 @@ class LLMCost:
 
 
 class Client:
-    """Configuration for OpenAI model endpoints"""
+    """Configuration for Google Gemini model endpoints"""
 
-    def __init__(self, azure_endpoint: str,
-                 api_key: str,
-                 model: str,
-                 api_version: str,
-                 async_: bool = False,
-                 tokens_per_minute_limit: int = 450_000,
-                 requests_per_minute_limit: int = 4_500):
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        tokens_per_minute_limit: int = 450_000,
+        requests_per_minute_limit: int = 4_500,
+    ):
         self.tokens_per_minute_limit = tokens_per_minute_limit
         self.requests_per_minute_limit = requests_per_minute_limit
-        self.azure_endpoint = azure_endpoint
         self.api_key = api_key
         self.model = model
-        self.api_version = api_version
-        self.async_ = async_
+        genai.configure(api_key=self.api_key)
+        self.client = genai.GenerativeModel(self.model)
 
-        if async_:
-            self.client = AsyncAzureOpenAI(
-                azure_endpoint=self.azure_endpoint,
-                api_key=self.api_key,
-                api_version=self.api_version,
-                # azure_deployment=self.model,
-            )
-        else:
-            self.client = AzureOpenAI(
-                azure_endpoint=self.azure_endpoint,
-                api_key=self.api_key,
-                api_version=self.api_version,
-                # azure_deployment=self.model,
-            )
         self.encoder = tiktoken.encoding_for_model(
             "gpt-4o"
         )  # same encoding with 4o-mini as with 4o
@@ -143,17 +128,15 @@ class Client:
 
         In NOK.
 
-        https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/
+        https://ai.google.dev/pricing
         """
         return calculate_cost(
-            is_mini="mini" in self.model.lower(),
             input_tokens=input_tokens,
             output_tokens=output_tokens,
         )
 
 
 def calculate_cost(
-    is_mini: bool,
     input_tokens: str | Iterable[str] | int = 0,
     output_tokens: str | Iterable[str] | int = 0,
 ) -> LLMCost:
@@ -163,16 +146,11 @@ def calculate_cost(
 
     In NOK.
 
-    https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/
+    https://ai.google.dev/pricing
     """
-    if is_mini:
-        # GPT-4o-mini Regional API
-        cost_per_1m_inp_nok = 1.735108
-        cost_per_1m_out_nok = 6.94043
-    else:
-        # gpt-4o-2024-08-06 Global Deployment
-        cost_per_1m_inp_nok = 26.2896
-        cost_per_1m_out_nok = 105.158001
+    # Gemini 1.5 Pro
+    cost_per_1m_inp_nok = 0.75264
+    cost_per_1m_out_nok = 2.257919
 
     encoder = tiktoken.encoding_for_model(
         "gpt-4o"

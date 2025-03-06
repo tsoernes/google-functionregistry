@@ -1,22 +1,16 @@
-[tool.poetry]
-name = "openai_functionregistry"
+[project]
+name = "google_functionregistry"
 version = "0.2.6"
-description = "OpenAI Function and Parser Registry"
+description = "Google Function and Parser Registry"
 authors = ["Torstein Sørnes <t.soernes@gmail.com>"]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.11"
-betterpathlib = "^0.1.1"
-python-dotenv = "^1.0.1"
-openai = "^1.50.2"
-pydantic = "^2.9.2"
-tiktoken = "^0.9.0"
-
-[tool.poetry.group.dev.dependencies]
-ipython = "^8.27.0"
-stackprinter = "^0.2.12"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires-python = ">=3.13"
+dependencies = [
+  "betterpathlib>=0.1.1",
+  "python-dotenv>=1.0.1",
+  "pydantic>=2.9.2",
+  "google-genai>=1.4.0",
+  "six>=1.17.0",
+  "ipython>=9.0.1",
+  "google-generativeai>=0.8.4",
+]
