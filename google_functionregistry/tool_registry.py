@@ -2,6 +2,7 @@
 Defines a `ParserRegistry` and a `FunctionRegistry` to make it convenient
 """
 
+import enum
 import logging
 import os
 from argparse import ArgumentError
@@ -72,7 +73,6 @@ class BaseRegistry:
                 api_key = os.environ[api_key_env]
             except KeyError:
                 raise ValueError("api_key_env not found in environment")
-            raise ValueError("api_key not specified")
 
         # genai.configure(api_key=api_key)
         # self.client = genai.GenerativeModel(model)
@@ -89,14 +89,18 @@ class ParserRegistry(BaseRegistry):
     def parse_response(
         self,
         messages: list[dict[str, str]] | str,
-        model: type[Model],
+        model: type[Model | enum.Enum],
     ) -> tuple[GenerateContentResponse, Model]:
         """Parse multiple unstructured responses into structured data"""
+        if isinstance(model, enum.Enum):
+            mime_type = "text/x.enum"
+        else:
+            mime_type = "application/json"
         response = self.client.models.generate_content(
             model=self.model,
             contents=messages,
             config={
-                "response_mime_type": "application/json",
+                "response_mime_type": mime_type,
                 "response_schema": model,
             },
         )
@@ -115,3 +119,13 @@ def test():
     model = list[Recipe]
     r = ParserRegistry()
     response, models = r.parse_response(messages, model)
+
+    class Instrument(enum.Enum):
+        PERCUSSION = "Percussion"
+        STRING = "String"
+        WOODWIND = "Woodwind"
+        BRASS = "Brass"
+        KEYBOARD = "Keyboard"
+
+    messages = "What type of instrument is an oboe?"
+    response, models = r.parse_response(messages, Instrument)

@@ -23,3 +23,23 @@ classifiers = [
   name = "pypi"
   url = "https://pypi.org/simple/"
   publish-url = "https://upload.pypi.org/"
+[tool.poetry]
+name = "google_functionregistry"
+version = "0.2.6"
+description = "Google Function and Parser Registry"
+authors = ["Torstein Sørnes <t.soernes@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "google_functionregistry" }]
+license = "MIT"  # Replace with your actual license if different
+[tool.poetry.dependencies]
+python = ">=3.13"
+betterpathlib = ">=0.1.1"
+python-dotenv = ">=1.0.1"
+pydantic = ">=2.9.2"
+google-genai = ">=1.4.0"
+six = ">=1.17.0"
+ipython = ">=9.0.1"
+google-generativeai = ">=0.8.4"
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
