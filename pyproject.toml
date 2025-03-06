@@ -2,7 +2,7 @@
 name = "google_functionregistry"
 version = "0.2.6"
 description = "Google Function and Parser Registry"
-authors = ["Torstein Sørnes <t.soernes@gmail.com>"]
+authors = [{name = "Torstein Sørnes", email= "t.soernes@gmail.com"}]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -14,3 +14,12 @@ dependencies = [
   "ipython>=9.0.1",
   "google-generativeai>=0.8.4",
 ]
+classifiers = [
+    "License :: OSI Approved :: MIT License", # Replace with your actual license
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+[[tool.uv.index]]
+  name = "pypi"
+  url = "https://pypi.org/simple/"
+  publish-url = "https://upload.pypi.org/"

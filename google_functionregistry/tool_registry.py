@@ -59,6 +59,7 @@ class BaseRegistry:
         self,
         model: str = "gemini-2.0-flash",
         api_key: str | None = None,
+        api_key_env: str = "GEMINI_API_KEY",
     ):
         if not api_key:
             try:
@@ -68,9 +69,10 @@ class BaseRegistry:
             except ImportError:
                 pass
             try:
-                api_key = os.environ["GEMINI_API_KEY"]
+                api_key = os.environ[api_key_env]
             except KeyError:
-                raise ValueError("api_key not specified")
+                raise ValueError("api_key_env not found in environment")
+            raise ValueError("api_key not specified")
 
         # genai.configure(api_key=api_key)
         # self.client = genai.GenerativeModel(model)
@@ -99,4 +101,17 @@ class ParserRegistry(BaseRegistry):
             },
         )
 
-        return response.text, response.parsed
+        return response, response.parsed
+
+
+def test():
+    from pydantic import BaseModel
+
+    class Recipe(BaseModel):
+        recipe_name: str
+        ingredients: list[str]
+
+    messages = "List a few popular cookie recipes. Be sure to include the amounts of ingredients."
+    model = list[Recipe]
+    r = ParserRegistry()
+    response, models = r.parse_response(messages, model)
